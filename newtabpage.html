@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Tab</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1f1d2e; color: #cdd6f4; }
+    body { display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .page { width: min(1120px, 100%); display: grid; gap: 24px; grid-template-columns: 1fr; }
+    .panel { background: #11111b; border: 1px solid #313244; border-radius: 28px; padding: 28px; box-shadow: 0 20px 80px rgba(10, 10, 18, 0.35); }
+    .header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .clock { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 0.9; letter-spacing: -0.04em; font-weight: 600; }
+    .date { color: #bac2de; font-size: 1rem; margin-top: 8px; }
+    .search { width: 100%; position: relative; margin: 16px 0 0; }
+    .search input { width: 100%; border: 1px solid #313244; border-radius: 999px; padding: 16px 20px; background: rgba(255,255,255,0.02); color: #cdd6f4; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+    .search input:hover { border-color: #94e2d5; }
+    .search input:focus { border-color: #f5c2e7; background: rgba(255,255,255,0.05); }
+    .search input::placeholder { color: #bac2de; }
+    .widgets { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .widget { border: 1px solid #313244; border-radius: 24px; padding: 22px; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 14px; }
+    .widget h2 { margin: 0; font-size: 1rem; color: #f5c2e7; font-weight: 600; }
+    .widget p { margin: 0; color: #bac2de; font-size: 0.95rem; line-height: 1.6; }
+    .quick-links { display: grid; gap: 14px; }
+    .quick-link { display: inline-flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,0.03); text-decoration: none; color: #cdd6f4; border: 1px solid transparent; transition: border 0.2s ease, background 0.2s ease; cursor: pointer; }
+    .quick-link:hover { background: rgba(255,255,255,0.06); border-color: #94e2d5; }
+    .quick-link .dot { width: 10px; height: 10px; border-radius: 50%; background: #94e2d5; flex-shrink: 0; }
+    .grid-2 { display: grid; gap: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .note { color: #bac2de; font-size: 0.95rem; }
+    @media (max-width: 720px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .page { gap: 16px; }
+      .panel { padding: 16px; border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    (function() {
+      const root = document.createElement('div');
+      root.className = 'page';
+
+      const header = document.createElement('section');
+      header.className = 'panel';
+      const headerContent = document.createElement('div');
+      headerContent.className = 'header';
+
+      const clockBlock = document.createElement('div');
+      const clockEl = document.createElement('div');
+      clockEl.className = 'clock';
+      clockEl.textContent = '--:--';
+      const dateEl = document.createElement('div');
+      dateEl.className = 'date';
+      clockBlock.appendChild(clockEl);
+      clockBlock.appendChild(dateEl);
+
+      const search = document.createElement('form');
+      search.className = 'search';
+      const searchInput = document.createElement('input');
+      searchInput.type = 'search';
+      searchInput.placeholder = 'Search the web...';
+      searchInput.setAttribute('aria-label', 'Search the web');
+      search.appendChild(searchInput);
+      search.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const query = searchInput.value.trim();
+        if (!query) return;
+        window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+      });
+
+      headerContent.appendChild(clockBlock);
+      headerContent.appendChild(search);
+      header.appendChild(headerContent);
+      root.appendChild(header);
+
+      const widgets = document.createElement('section');
+      widgets.className = 'widgets';
+
+      const quickWidget = document.createElement('article');
+      quickWidget.className = 'widget';
+      const quickTitle = document.createElement('h2');
+      quickTitle.textContent = 'Quick access';
+      const quickDesc = document.createElement('p');
+      quickDesc.textContent = 'Minimal new tab with fast links to your favorite media and social hubs.';
+      quickWidget.appendChild(quickTitle);
+      quickWidget.appendChild(quickDesc);
+      
+      const quickLinks = document.createElement('div');
+      quickLinks.className = 'quick-links';
+      const links = [
+        { name: 'YouTube', href: 'https://www.youtube.com' },
+        { name: 'TikTok', href: 'https://www.tiktok.com' },
+        { name: 'Instagram', href: 'https://www.instagram.com' },
+        { name: 'Twitter / X', href: 'https://twitter.com' }
+      ];
+      links.forEach(item => {
+        const a = document.createElement('a');
+        a.className = 'quick-link';
+        a.href = item.href;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        const text = document.createElement('span');
+        text.textContent = item.name;
+        a.appendChild(dot);
+        a.appendChild(text);
+        quickLinks.appendChild(a);
+      });
+      quickWidget.appendChild(quickLinks);
+
+      const feedWidget = document.createElement('article');
+      feedWidget.className = 'widget';
+      const feedTitle = document.createElement('h2');
+      feedTitle.textContent = 'Media widgets';
+      const feedDesc = document.createElement('p');
+      feedDesc.textContent = 'Tap the cards to jump to a quick playlist, trending feed, or social feed.';
+      feedWidget.appendChild(feedTitle);
+      feedWidget.appendChild(feedDesc);
+      
+      const mediaGrid = document.createElement('div');
+      mediaGrid.className = 'grid-2';
+      const mediaItems = [
+        { title: 'YouTube trending', description: 'Open the latest trending videos.', href: 'https://www.youtube.com/feed/trending' },
+        { title: 'TikTok Discover', description: 'See trending TikToks and popular creators.', href: 'https://www.tiktok.com/discover' },
+        { title: 'YouTube Music', description: 'Launch music videos and curated mixes.', href: 'https://music.youtube.com' },
+        { title: 'TikTok for You', description: 'Check the For You page quickly.', href: 'https://www.tiktok.com' }
+      ];
+      mediaItems.forEach(item => {
+        const card = document.createElement('a');
+        card.className = 'quick-link';
+        card.href = item.href;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+        card.style.padding = '18px';
+        card.style.borderRadius = '20px';
+        card.style.flexDirection = 'column';
+        card.style.alignItems = 'flex-start';
+        
+        const title = document.createElement('strong');
+        title.textContent = item.title;
+        
+        const desc = document.createElement('div');
+        desc.className = 'note';
+        desc.textContent = item.description;
+        
+        card.appendChild(title);
+        card.appendChild(desc);
+        mediaGrid.appendChild(card);
+      });
+      feedWidget.appendChild(mediaGrid);
+
+      widgets.appendChild(quickWidget);
+      widgets.appendChild(feedWidget);
+      root.appendChild(widgets);
+
+      const infoPanel = document.createElement('section');
+      infoPanel.className = 'panel';
+      const infoText = document.createElement('div');
+      infoText.className = 'note';
+      infoText.textContent = 'Catppuccin Mocha-inspired minimal design with a clean clock, search, and quick links to YouTube, TikTok, and social media. Refresh to update time and start browsing instantly.';
+      infoPanel.appendChild(infoText);
+      root.appendChild(infoPanel);
+
+      document.body.appendChild(root);
+
+      function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+        dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    })();
+  </script>
+</body>
+</html>
